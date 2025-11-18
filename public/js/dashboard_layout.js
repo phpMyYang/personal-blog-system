@@ -129,8 +129,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Pagsunud-sunurin base sa Status (Pending muna)
                 "order": [[ 3, 'asc' ]], 
                 "language": {
-                    "emptyTable": "<div style='text-align: center !important; padding: 2rem 0 !important; font-style: italic;'>No comments found.</div>",
-                    "zeroRecords": "<div style='text-align: center !important; padding: 2rem 0 !important; font-style: italic;'>No matching comments found.</div>"
+                    "emptyTable": "<div style='text-align: center !important; font-style: italic;'>No comments found.</div>",
+                    "zeroRecords": "<div style='text-align: center !important; font-style: italic;'>No matching comments found.</div>"
                 }
             });
         }
@@ -138,18 +138,149 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error("DataTables initialization failed:", e);
     }
 
+    const editCategoryModal = document.getElementById('editCategoryModal');
+    const categoriesTable = document.getElementById('categoriesTable');
+
+    if (categoriesTable && editCategoryModal) {
+
+        categoriesTable.addEventListener('click', function(event) {
+
+            const clickedElement = event.target;
+            const editButton = clickedElement.closest('.edit-btn'); 
+
+            if (!editButton) {
+                return; 
+            }
+
+            event.preventDefault();
+
+            const categoryName = editButton.getAttribute('data-name');
+            const categorySlug = editButton.getAttribute('data-slug');
+            const updateUrl = editButton.getAttribute('data-update-url');
+
+            const modalForm = document.getElementById('editCategoryForm');
+            const modalNameInput = document.getElementById('edit_name');
+            const modalSlugInput = document.getElementById('edit_slug');
+
+            if (modalForm) modalForm.setAttribute('action', updateUrl);
+            if (modalNameInput) modalNameInput.value = categoryName;
+            if (modalSlugInput) modalSlugInput.value = categorySlug;
+
+            const modalInstance = new bootstrap.Modal(editCategoryModal);
+            modalInstance.show();
+        });
+    }
+
     try {
         if ($('#categoriesTable').length) { 
             $('#categoriesTable').DataTable({
                 "pageLength": 10,
-                "order": [], // Walang initial sorting
+                "order": [],
+                "autoWidth": false, 
                 "language": {
-                    "emptyTable": "<div style='text-align: center !important; padding: 2rem 0 !important; font-style: italic;'>No categories created yet.</div>",
-                    "zeroRecords": "<div style='text-align: center !important; padding: 2rem 0 !important; font-style: italic;'>No matching categories found.</div>"
+                    "emptyTable": "<div style='text-align: center !important; font-style: italic;'>No categories created yet.</div>",
+                    "zeroRecords": "<div style='text-align: center !important; font-style: italic;'>No matching categories found.</div>"
                 }
             });
         }
     } catch (e) {
         console.error("DataTables initialization failed:", e);
+    }
+    
+    const postsCtx = document.getElementById('postsChart');
+    const commentsCtx = document.getElementById('commentsChart');
+
+    if (postsCtx && commentsCtx && typeof Chart !== 'undefined') {
+        try {
+            const style = getComputedStyle(document.body);
+            const colorPrimary = style.getPropertyValue('--color-primary').trim();
+            const colorAccent = style.getPropertyValue('--color-accent').trim();
+            const colorTextLight = style.getPropertyValue('--color-text-light').trim();
+            const postDataString = postsCtx.getAttribute('data-chart-data');
+            const postData = JSON.parse(postDataString);
+
+            new Chart(postsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Posts',
+                        data: postData, 
+                        backgroundColor: colorPrimary,
+                        borderColor: colorPrimary,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                precision: 0 
+                            }
+                        }
+                    }
+                }
+            });
+
+            const commentDataString = commentsCtx.getAttribute('data-chart-data');
+            const commentData = JSON.parse(commentDataString);
+
+            new Chart(commentsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Approved', 'Pending'],
+                    datasets: [{
+                        data: commentData,
+                        backgroundColor: [
+                            colorAccent, 
+                            colorTextLight 
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+        } catch (e) {
+            console.error("Chart.js initialization failed:", e);
+        }
+    }
+
+    const passwordToggleIcons = document.querySelectorAll('.password-toggle-icon');
+
+    if (passwordToggleIcons.length > 0) {
+        passwordToggleIcons.forEach(iconElement => {
+            
+            iconElement.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                const inputGroup = this.closest('.input-group');
+                const input = inputGroup.querySelector('input');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
+            });
+
+        });
     }
 });

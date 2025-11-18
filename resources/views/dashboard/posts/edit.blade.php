@@ -61,15 +61,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">Categories</label>
-                    <div class="category-checkbox-list">
+                    <div class="category-tag-list">
                         @forelse ($categories as $category)
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="categories[]" 
-                                    value="{{ $category->id }}" id="category-{{ $category->id }}"
+                                    value="{{ $category->id }}" id="edit-category-{{ $category->id }}"
 
-                                    @checked($post->categories->contains($category->id))
-                                >
-                                <label class="form-check-label" for="category-{{ $category->id }}">
+                                    @checked($post->categories->contains($category->id))>
+                                <label class="form-check-label" for="edit-category-{{ $category->id }}">
                                     {{ $category->name }}
                                 </label>
                             </div>

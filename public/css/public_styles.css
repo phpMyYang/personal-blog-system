@@ -51,7 +51,7 @@ body {
 /* 1. Fix Indicator Centering and Placement */
 .custom-indicators {
     position: fixed;    
-    bottom: 10rem;        
+    bottom: 8rem;        
     left: 50%;
     transform: translateX(-50%);
     margin: 0 !important; 

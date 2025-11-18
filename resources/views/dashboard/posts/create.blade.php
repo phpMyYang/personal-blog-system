@@ -54,12 +54,12 @@
 
                 <div class="mb-3">
                     <label class="form-label">Categories</label>
-                    <div class="category-checkbox-list">
+                    <div class="category-tag-list">
                         @forelse ($categories as $category)
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="categories[]" 
-                                    value="{{ $category->id }}" id="category-{{ $category->id }}">
-                                <label class="form-check-label" for="category-{{ $category->id }}">
+                                    value="{{ $category->id }}" id="create-category-{{ $category->id }}">
+                                <label class="form-check-label" for="create-category-{{ $category->id }}">
                                     {{ $category->name }}
                                 </label>
                             </div>

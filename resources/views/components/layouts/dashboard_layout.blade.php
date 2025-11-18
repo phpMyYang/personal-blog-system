@@ -112,14 +112,11 @@
 @endif
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
-
 <script src="https://cdn.tiny.cloud/1/mbnysu8x84ywme1e9dec6zoc6jbna703csbf677wczxgen7y/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="{{ asset('js/dashboard_layout.js') }}"></script>
 <script src="{{ asset('js/toast_handler.js') }}"></script>
 

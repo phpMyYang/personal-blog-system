@@ -10,16 +10,70 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; 
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use App\Models\Comment;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
     /**
-     * Ipakita ang profile management view.
+     * Ipakita ang profile management view, kasama ang stats.
      */
     public function edit(Request $request)
     {
+        $user = $request->user();
+        $selectedYear = $request->query('year', date('Y')); 
+        $availableYears = $user->posts()
+                              ->select(DB::raw('YEAR(created_at) as year'))
+                              ->distinct()
+                              ->orderBy('year', 'desc')
+                              ->pluck('year')
+                              ->all();
+        
+        if (!in_array(date('Y'), $availableYears)) {
+            array_unshift($availableYears, date('Y'));
+        }
+
+        $totalPosts = $user->posts()->count();
+        $allPostIds = $user->posts()->pluck('id'); 
+        $allCommentsQuery = Comment::whereIn('post_id', $allPostIds); 
+        $commentStats = [
+            'approved' => (clone $allCommentsQuery)->where('is_verified', true)->count(),
+            'pending' => (clone $allCommentsQuery)->where('is_verified', false)->count(),
+        ];
+        $totalComments = $commentStats['approved'] + $commentStats['pending'];
+        $postsPerMonth = $user->posts()
+            ->select(
+                DB::raw('MONTH(created_at) as month'), 
+                DB::raw('COUNT(*) as count')
+            )
+            ->whereYear('created_at', $selectedYear) 
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('count', 'month')
+            ->all();
+
+        $chartData = array_fill(1, 12, 0); 
+        foreach ($postsPerMonth as $month => $count) {
+            $chartData[$month] = $count;
+        }
+        $postChartDataJson = json_encode(array_values($chartData));
+        $postIdsThisYear = $user->posts()->whereYear('created_at', $selectedYear)->pluck('id');
+        $commentsQueryThisYear = Comment::whereIn('post_id', $postIdsThisYear); 
+        $commentStatsThisYear = [
+            'approved' => (clone $commentsQueryThisYear)->where('is_verified', true)->count(),
+            'pending' => (clone $commentsQueryThisYear)->where('is_verified', false)->count(),
+        ];
+        $commentStatsJson = json_encode(array_values($commentStatsThisYear)); 
+
         return view('dashboard.profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'totalPosts' => $totalPosts,
+            'totalComments' => $totalComments, 
+            'pendingComments' => $commentStats['pending'],
+            'commentStatsJson' => $commentStatsJson, 
+            'postChartDataJson' => $postChartDataJson, 
+            'availableYears' => $availableYears, 
+            'selectedYear' => $selectedYear,     
         ]);
     }
 

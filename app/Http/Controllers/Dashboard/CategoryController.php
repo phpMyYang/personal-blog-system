@@ -43,14 +43,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Ipakita ang edit form.
-     */
-    public function edit(Category $category)
-    {
-        return view('dashboard.categories.edit', ['category' => $category]);
-    }
-
-    /**
      * I-update ang category.
      */
     public function update(Request $request, Category $category)

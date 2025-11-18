@@ -65,10 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/dashboard/comments/{comment}/approve', [CommentManagementController::class, 'approve'])->name('dashboard.comments.approve');
     Route::delete('/dashboard/comments/{comment}', [CommentManagementController::class, 'destroy'])->name('dashboard.comments.destroy');
 
-    // Ito ay gagawa ng routes para sa index, create, store, edit, update, destroy
     Route::resource('/dashboard/categories', CategoryController::class)
-         ->except(['show']) // Alisin ang 'show' route
-         ->names('dashboard.categories'); // Pangalanan natin (e.g., dashboard.categories.index)
+            ->except(['show', 'create', 'edit'])
+            ->names('dashboard.categories');
 });
 
 
